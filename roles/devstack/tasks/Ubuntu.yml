@@ -1,0 +1,14 @@
+- name: install base packages
+  package:
+    name: "{{ package }}" 
+    state: present 
+  loop:
+    - git
+    - vim
+    - libvirt-daemon
+    - apache2 
+    - memcached 
+    - bind9 
+  loop_control:
+    loop_var: package
+  become: true

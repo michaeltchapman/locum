@@ -1,0 +1,7 @@
+Host {{ vm_name }}
+     HostName {{ vm_ip.stdout }}
+     User {{ vm_info.ansible_user | default('vagrant') }}
+     Port 22 
+     IdentityFile {{ localvm_identity_file | default('~/.vagrant.d/insecure_private_key') }}
+     StrictHostKeyChecking=no
+     UserKnownHostsFile=/dev/null

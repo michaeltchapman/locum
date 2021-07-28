@@ -1,0 +1,129 @@
+[[local|localrc]]
+
+GIT_BASE=https://opendev.org
+
+HOST_IP={{ ansible_default_ipv4.address }}
+HOST_IPV6={{ ansible_default_ipv6.address }}
+PASSWORD={{ service_password }}
+
+VERBOSE=True
+LOG_COLOR=False
+LOGFILE=/opt/stack/logs/devstacklog.txt
+
+disable_all_services
+enable_service rabbit mysql key memcached
+
+LIBS_FROM_GIT=designate,neutron
+enable_plugin designate https://opendev.org/openstack/designate
+enable_plugin neutron https://opendev.org/openstack/neutron
+
+DESIGNATE_BRANCH=refs/changes/31/681131/34
+
+#PASSWORDS
+MYSQL_PASSWORD=$PASSWORD
+SERVICE_TOKEN=$PASSWORD
+SERVICE_PASSWORD=$PASSWORD
+ADMIN_PASSWORD=$PASSWORD
+RABBIT_PASSWORD=$PASSWORD
+
+# Designate Devstack Config
+# =========================
+# Enable core Designate services
+enable_service designate,designate-central,designate-api,designate-worker,designate-producer,designate-mdns
+
+# Optional Designate services
+#enable_service designate-agent
+#enable_service designate-sink
+
+# Backend Driver (e.g. powerdns, bind9. See designate.backend section of
+#                 setup.cfg)
+DESIGNATE_BACKEND_DRIVER=bind9
+
+# Agent Backend Driver (Used only when DESIGNATE_BACKEND_DRIVER=agent)
+#DESIGNATE_AGENT_BACKEND_DRIVER=fake
+
+# Pool Manager Cache Driver (e.g. noop, memcache, sqlalchemy. See
+#                            designate.backend section of setup.cfg)
+#DESIGNATE_POOL_MANAGER_CACHE_DRIVER=memcache
+
+# mDNS Service DNS Port Number
+#DESIGNATE_SERVICE_PORT_MDNS=5354
+
+# Designate Misc Config
+# =====================
+
+# Enable a Notification Driver (e.g. for Ceiliometer)
+#DESIGNATE_NOTIFICATION_DRIVER=messaging
+
+# Set Notification topics
+#DESIGNATE_NOTIFICATION_TOPICS=notifications
+
+# Set coordination service URL (e.g. kazoo://localhost/)
+#DESIGNATE_COORDINATION_URL=
+
+LIBS_FROM_GIT=devstack
+
+# Other Devstack Config
+# =====================
+# Optional TLS Proxy
+#enable_service tls-proxy
+
+# Optional Tempest (Recommended)
+enable_service tempest
+
+# Optional Rally
+#enable_plugin rally https://opendev.org/openstack/rally.git master
+
+# Optional Horizon
+#enable_service horizon
+
+# Optional Glance
+enable_service g-api,g-reg
+
+# Nova
+enable_service n-api
+enable_service n-api-meta
+enable_service n-cond
+enable_service n-cpu
+enable_service n-novnc
+enable_service n-sch
+enable_service placement-api
+
+# Neutron
+enable_service neutron-conntrack-helper
+enable_service neutron-dns
+enable_service neutron-network-segment-range
+enable_service neutron-port-forwarding
+enable_service neutron-qos
+enable_service neutron-segments
+enable_service neutron-tag-ports-during-bulk-creation
+enable_service neutron-trunk
+enable_service neutron-uplink-status-propagation
+enable_service ovn-controller
+enable_service ovn-northd
+enable_service ovs-vswitchd
+enable_service ovsdb-server
+disable_service q-agt
+disable_service q-dhcp
+disable_service q-l3
+disable_service q-meta
+disable_service q-metering
+enable_service q-ovn-metadata-agent
+enable_service q-qos
+enable_service q-svc
+
+Q_AGENT="ovn"
+Q_ML2_PLUGIN_MECHANISM_DRIVERS="ovn,logger"
+Q_ML2_PLUGIN_TYPE_DRIVERS="local,flat,vlan,geneve"
+Q_ML2_TENANT_NETWORK_TYPE="geneve"
+
+#OVN_BRANCH="v20.12.0"
+#OVN_BUILD_FROM_SOURCE="True"
+OVN_DBS_LOG_LEVEL="dbg"
+OVN_IGMP_SNOOPING_ENABLE="True"
+OVN_L3_CREATE_PUBLIC_NETWORK="True"
+#OVS_BRANCH="branch-2.15"
+#OVS_SYSCONFDIR="/usr/local/etc/openvswitch"
+PHYSICAL_NETWORK="public"
+
+#DESIGNATE_BRANCH=refs/changes/33/796633/4

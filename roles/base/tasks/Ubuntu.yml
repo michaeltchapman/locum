@@ -1,0 +1,8 @@
+- name: install some base packages
+  package:
+    name: "{{ item }}"
+    state: latest 
+  loop:
+    - ansible
+    - git 
+  become: true

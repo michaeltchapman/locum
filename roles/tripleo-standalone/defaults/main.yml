@@ -1,0 +1,2 @@
+standalone_base_dir: /home/vagrant 
+standalone_generate_container_params: false

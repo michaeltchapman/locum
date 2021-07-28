@@ -1,0 +1,33 @@
+parameter_defaults:
+  CloudName: {{ ansible_eth1.ipv4.address }} 
+  ControlPlaneStaticRoutes: []
+  #ControlPlaneStaticRoutes:
+  #  - ip_netmask: 0.0.0.0/0
+  #    next_hop: 192.168.122.1
+  #    default: true
+  Debug: true
+  DeploymentUser: vagrant
+  DnsServers:
+    - 1.1.1.1
+    - 8.8.8.8
+  DockerInsecureRegistryAddress:
+    - {{ ansible_eth1.ipv4.address }}:8787
+  NeutronPublicInterface: eth1 
+  # domain name used by the host
+  NeutronDnsDomain: localdomain
+  # re-use ctlplane bridge for public net, defined in the standalone
+  # net config (do not change unless you know what you're doing)
+  NeutronBridgeMappings: datacentre:br-ctlplane
+  NeutronPhysicalBridge: br-ctlplane
+  # enable to force metadata for public net
+  #NeutronEnableForceMetadata: true
+  StandaloneEnableRoutedNetworks: false
+  StandaloneHomeDir: /home/vagrant
+  StandaloneLocalMtu: 1500
+  # Needed if running in a VM, not needed if on baremetal
+  NovaComputeLibvirtType: kvm
+  GlanceBackend: file
+  ConfigDebug: true
+  OctaviaAmphoraSshKeyFile: /home/vagrant/.ssh/id_rsa.pub
+  OctaviaAmphoraImageFilename: /home/vagrant/amphora-x64-haproxy-centos.qcow2
+  OctaviaEnableDriverAgent: false

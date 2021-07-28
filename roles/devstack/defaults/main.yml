@@ -1,0 +1,9 @@
+#devstack_dir: /home/vagrant/devstack
+devstack_dir: /opt/stack
+#devstack_version: stable/stein
+devstack_version: stable/wallaby
+service_password: password
+
+# for applying a pending patch
+#devstack_cherry_pick: git fetch "https://review.opendev.org/openstack/designate" refs/changes/74/788874/10 && git cherry-pick FETCH_HEAD
+#devstack_cherry_pick_project: designate

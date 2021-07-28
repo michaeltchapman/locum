@@ -1,0 +1,45 @@
+- name: os deps
+  include_tasks: "{{ ansible_distribution }}.yml"
+
+- name: debug
+  debug:
+    var: ansible_all_ipv4_addresses
+
+- set_fact:
+    controller_host_ip: "{{ ansible_default_ipv4.address }}"
+
+- hostname:
+    name: devstack
+  become: true
+
+- name: create devstack directory
+  file:
+    path: "{{ devstack_dir }}"
+    state: directory
+    owner: vagrant
+    group: vagrant
+  become: true
+
+- name: clone devstack repo
+  git:
+    repo: https://opendev.org/openstack-dev/devstack
+    dest: "{{ devstack_dir }}/devstack"
+    version: "{{ devstack_version }}"
+
+- name: set git name
+  command: git config --global user.name "John Doe"
+  when: cherry_pick is defined
+- name: set git email
+  command: git config --global user.email johndoe@example.com
+  when: cherry_pick is defined
+
+- name: create local.conf for controller
+  template:
+    src: local.conf.j2
+    dest: "{{ devstack_dir }}/devstack/local.conf"
+    mode: 0644
+
+- name: stack the stack
+  command: ./stack.sh
+  args:
+    chdir: "{{ devstack_dir }}/devstack"

@@ -1,0 +1,7 @@
+---
+- name: Make vm
+  include_tasks: make_vm.yml 
+  vars:
+    vm_info: "{{ item.value }}"
+    vm_name: "{{ item.key }}"
+  loop: "{{ locum | dict2items }}"

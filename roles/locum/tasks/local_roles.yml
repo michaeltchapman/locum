@@ -1,0 +1,7 @@
+---
+- name: Import roles on guest vm
+  include_role:
+    name: "{{ role }}"
+  loop: "{{ locum_roles }}"
+  loop_control:
+    loop_var: role

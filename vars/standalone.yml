@@ -1,0 +1,29 @@
+locum:
+  standalone:
+    image:
+      provider: vagrant
+      group: centos 
+      name: stream8 
+    state: present
+    name: 'standalone'
+    memory_mb: 10000
+    vcpus: 4
+    resize: 40G
+    ssh_wait: 30
+    ssh:
+      pub_key: /home/michapma/.ssh/id_rsa.pub 
+      priv_key: /home/michapma/.ssh/id_rsa 
+      user: vagrant
+    interfaces:
+      - type: bridge
+        source:
+          dev: virbr0
+      - type: bridge
+        source:
+          dev: br-local-test 
+      - type: bridge
+        source:
+          dev: br-local-pub 
+    roles:
+      - base 
+      - tripleo-standalone 

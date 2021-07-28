@@ -1,0 +1,35 @@
+- name: Platform specifics
+  include_tasks: "{{ ansible_distribution }}.yml"
+
+- name: create resolv.conf
+  template:
+    src: resolv.conf.j2
+    dest: /etc/resolv.conf
+    mode: 0644
+  become: true
+
+- name: make sure ipv6 isn't disabled in eth0 script
+  ansible.builtin.lineinfile:
+    path: /etc/sysctl.conf
+    regexp: 'net.ipv6.conf.all.disable_ipv6'
+    line: 'net.ipv6.conf.all.disable_ipv6=0'
+  become: true
+
+- name: ensure ipv6 is enabled
+  command: "sysctl -w net.ipv6.conf.all.disable_ipv6=0"
+  become: true
+
+- name: install some base packages
+  package:
+    name: "{{ item }}"
+    state: latest 
+  loop:
+    - git 
+  become: true
+
+- name: Re-read facts
+  ansible.builtin.setup:
+
+- name: Print all available facts
+  ansible.builtin.debug:
+    var: ansible_facts

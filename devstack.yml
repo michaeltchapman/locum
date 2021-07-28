@@ -1,0 +1,17 @@
+---
+- name: provision vm 
+  hosts: localhost
+  tasks:
+    - name: Manage local VMs
+      include_role:
+        name: locum 
+
+- name: configure local vm 
+  hosts: locum
+  tasks:
+    - name: include local roles for vm 
+      include_role:
+        name: locum
+        tasks_from: local_roles
+      vars:
+        locum: "{{ locum }}"

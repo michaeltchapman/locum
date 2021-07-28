@@ -1,0 +1,50 @@
+- name: add DNS servers to NetworkManager
+  command: "nmcli con mod \"System eth0\" ipv4.dns \"{{ dns_servers | join(' ') }}\""
+  become: true
+
+- name: add DNS to NetworkManager
+  command: "nmcli con mod 'System eth0' ipv4.ignore-auto-dns yes"
+  become: true
+
+- name: reload config for eth0
+  command: "nmcli con up 'System eth0'"
+  become: true
+
+- name: make sure ipv6 isn't disabled in eth0 script
+  ansible.builtin.lineinfile:
+    path: /etc/sysconfig/network-scripts/ifcfg-eth0
+    regexp: 'IPV6'
+    state: absent
+  become: true
+
+- name: make sure ipv6 isn't disabled in eth0 script
+  ansible.builtin.lineinfile:
+    path: /etc/sysconfig/network-scripts/ifcfg-eth0
+    line: 'IPV6INIT=yes'
+  become: true
+
+- name: make sure ipv6 isn't disabled in eth0 script
+  ansible.builtin.lineinfile:
+    path: /etc/sysconfig/network-scripts/ifcfg-eth0
+    line: 'IPV6_AUTOCONF=yes'
+  become: true
+
+- name: make sure ipv6 isn't disabled in eth0 script
+  ansible.builtin.lineinfile:
+    path: /etc/sysconfig/network-scripts/ifcfg-eth0
+    line: 'IPV6_DEFROUTE=yes'
+  become: true
+
+- name: make sure ipv6 isn't disabled in eth0 script
+  ansible.builtin.lineinfile:
+    path: /etc/sysconfig/network-scripts/ifcfg-eth0
+    line: 'IPV6_FAILURE_FATAL=no'
+  become: true
+
+- name: update all packages
+  command: "yum update -y"
+  become: true
+
+- name: restart NM to enable ipv6
+  command: "systemctl restart NetworkManager"
+  become: true

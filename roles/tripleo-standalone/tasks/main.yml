@@ -1,0 +1,144 @@
+- name: remove epel
+  package:
+    name: epel-release
+    state: absent
+  become: true
+
+- name: cleanse epel repo files
+  command: "rm -rf /etc/yum.repos.d/epel*"
+  become: true
+
+- name: dnf update
+  command: "dnf -y update"
+  become: true
+
+- name: install base packages
+  package:
+    name: "{{ item }}" 
+    state: present 
+  with_items:
+    - git
+    - vim
+    - wget 
+    - tmux 
+    - bc 
+  become: true
+
+- name: Add kvm-intel to modprobe.d dist.conf
+  lineinfile:
+    path: /etc/modprobe.d/dist.conf
+    line: options kvm-intel nested=y
+    create: yes
+  become: true
+
+- name: remove kvm_intel kernel module
+  command: "modprobe -r kvm_intel"
+  ignore_errors: true
+  become: true
+
+- name: insert kvm_intel kernel module with nesting 
+  command: "modprobe kvm_intel nested=1"
+  ignore_errors: true
+  become: true
+
+- name: Ensure SELinux is configured for permissive mode
+  lineinfile:
+    path: /etc/selinux/config
+    regexp: '^SELINUX='
+    line: SELINUX=permissive
+  become: true
+
+- name: Set SELinux to permissive mode
+  command: "setenforce 0"
+  become: true
+
+- name: Get ip for eth1
+  command: "dhclient eth1"
+  become: true
+
+- set_fact:
+    controller_host_ip: "{{ ansible_default_ipv4.address }}"
+
+- hostname:
+    name: devstack.localdomain
+  become: true
+
+ # https://bugs.centos.org/view.php?id=17133
+- name: Remove bogus net script
+  command: "rm -f /etc/sysconfig/network-scripts/ifcfg-ens3"
+  become: true
+
+- name: Add Delorian Repo
+  command: "curl -s -o /etc/yum.repos.d/delorean.repo https://trunk.rdoproject.org/centos8/current-tripleo-rdo/delorean.repo"
+  become: true
+
+- name: Install Tripleo Repos 
+  package:
+    name: "python3-tripleo-repos" 
+    state: present 
+  become: true
+
+- name: Add Current Tripleo Repo
+  command: "tripleo-repos current-tripleo-dev"
+  become: true
+
+- name: Reset container tools 
+  command: "dnf -y module reset container-tools"
+  become: true
+
+- name: Use new container tools to fix iscsi issue
+  command: "dnf -y module enable container-tools:3.0"
+  become: true
+
+- name: install tripleo repos 
+  package:
+    name: "python3-tripleoclient" 
+    state: present 
+  become: true
+
+- name: Prepare container images
+  command: "openstack tripleo container image prepare default --output-env-file {{ standalone_base_dir }}/containers-prepare-parameters.yaml"
+  become: true
+  when: standalone_generate_container_params
+
+- name: create standalone parameters
+  template:
+    src: containers-prepare-parameters.yaml.j2
+    dest: "{{ standalone_base_dir }}/containers-prepare-parameters.yaml"
+    mode: 0644
+  when: not standalone_generate_container_params
+
+- name: create designate parameters
+  template:
+    src: designate_parameters.yaml.j2
+    dest: "{{ standalone_base_dir }}/designate_parameters.yaml"
+    mode: 0644
+
+- name: Fetch amphora image
+  command: "curl -s -O https://images.rdoproject.org/octavia/master/amphora-x64-haproxy-centos.qcow2"
+  args:
+    chdir: "{{ standalone_base_dir }}"
+  become: true
+
+- name: create standalone parameters
+  template:
+    src: standalone_parameters.yaml.j2
+    dest: "{{ standalone_base_dir }}/standalone_parameters.yaml"
+    mode: 0644
+
+- name: create standalone deploy script 
+  template:
+    src: deploy_standalone.sh.j2
+    dest: "{{ standalone_base_dir }}/deploy_standalone.sh"
+    mode: 0755
+
+- name: create cleanup script 
+  template:
+    src: cleanup.sh.j2
+    dest: "{{ standalone_base_dir }}/cleanup.sh"
+    mode: 0755 
+
+- name: deploy standalone
+  command: ./deploy_standalone.sh
+  args:
+    chdir: "{{ standalone_base_dir }}"

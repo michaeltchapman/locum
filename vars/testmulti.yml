@@ -1,0 +1,40 @@
+locum:
+  vm1:
+    state: present
+    image:
+      provider: vagrant
+      group: generic
+      name: centos8
+    memory_mb: 1024
+    vcpus: 2
+    ssh_wait: 30
+    ssh:
+      pub_key: /home/michapma/.ssh/id_rsa.pub 
+      priv_key: /home/michapma/.ssh/id_rsa 
+      user: vagrant
+    interfaces:
+    - type: bridge
+      source:
+        dev: virbr0
+    roles:
+      - testrole 
+
+  vm2:
+    state: present
+    image:
+      provider: vagrant
+      group: generic
+      name: centos8
+    memory_mb: 1024 
+    vcpus: 2
+    ssh_wait: 30
+    ssh:
+      pub_key: /home/michapma/.ssh/id_rsa.pub 
+      priv_key: /home/michapma/.ssh/id_rsa 
+      user: vagrant
+    interfaces:
+    - type: bridge
+      source:
+        dev: virbr0
+    roles:
+      - testrole 
